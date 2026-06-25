@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#090D13">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>ЕРЛЕР — Жады · Память</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --ink:    #090D13;
+  --deep:   #0F1620;
+  --panel:  #151D2A;
+  --card:   #192333;
+  --border: rgba(255,255,255,0.07);
+  --gold:   #C8973C;
+  --gold2:  #E8B86D;
+  --cream:  #EDE9E0;
+  --muted:  #6B778C;
+  --green:  #2D6A4F;
+  --red:    #8B2020;
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+button,a{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{background:var(--ink);color:var(--cream);font-family:'Inter',sans-serif;overflow-x:hidden;}
+
+.ornament-bg{
+  position:absolute;inset:0;pointer-events:none;opacity:.03;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='none' stroke='%23C8973C' stroke-width='0.7'/%3E%3Cpath d='M30 8L52 30L30 52L8 30Z' fill='none' stroke='%23C8973C' stroke-width='0.5'/%3E%3Ccircle cx='30' cy='30' r='5' fill='none' stroke='%23C8973C' stroke-width='0.5'/%3E%3C/svg%3E");
+  background-size:60px 60px;
+}
+
+/* NAV */
+nav.top-nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:62px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 48px;
+  background:rgba(9,13,19,.95);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none;}
+.nav-emblem{
+  width:34px;height:34px;border-radius:50%;
+  border:1.5px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;
+}
+.nav-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;letter-spacing:.1em;color:#F5F3EE;}
+.nav-name span{color:var(--gold);}
+.nav-links{display:flex;gap:28px;list-style:none;}
+.nav-links a{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s;}
+.nav-links a:hover{color:#F5F3EE;}
+.nav-right{display:flex;align-items:center;gap:14px;}
+.lang-sw{display:flex;border:1px solid rgba(200,151,60,.3);border-radius:3px;overflow:hidden;}
+.lbtn{padding:5px 11px;background:none;border:none;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--muted);cursor:pointer;transition:all .2s;}
+.lbtn.active{background:var(--gold);color:var(--ink);}
+.btn-add-nav{padding:7px 18px;background:var(--gold);color:var(--ink);border:none;border-radius:3px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .2s;}
+.btn-add-nav:hover{background:var(--gold2);}
+.btn-admin-nav{padding:7px 14px;background:none;border:1px solid rgba(200,151,60,.3);color:var(--muted);border-radius:3px;font-size:11px;cursor:pointer;transition:all .2s;}
+.btn-admin-nav:hover{border-color:var(--gold);color:var(--gold);}
+.btn-admin-nav.logged{border-color:rgba(45,106,79,.5);color:#52b788;}
+
+/* BURGER */
+.burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;border:none;background:none;}
+.burger span{display:block;width:22px;height:2px;background:var(--cream);border-radius:2px;transition:all .25s;}
+.burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.burger.open span:nth-child(2){opacity:0;}
+.burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+/* MOBILE MENU */
+.mobile-menu{
+  display:none;position:fixed;top:56px;left:0;right:0;bottom:0;
+  background:rgba(9,13,19,.98);z-index:190;padding:32px 28px;
+  flex-direction:column;gap:20px;overflow-y:auto;
+}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{font-size:18px;font-weight:600;color:var(--cream);text-decoration:none;padding:10px 0;border-bottom:1px solid var(--border);}
+.mobile-menu-lang{display:flex;gap:12px;margin-top:8px;}
+.mobile-menu-lang button{padding:10px 24px;background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;}
+.mobile-menu-lang button.active{background:var(--gold);border-color:var(--gold);color:var(--ink);}
+.mobile-menu-add{margin-top:10px;padding:14px;background:var(--gold);color:var(--ink);border:none;border-radius:3px;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;
+  height:58px;background:rgba(9,13,19,.97);backdrop-filter:blur(12px);
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-around;padding:0 6px;
+}
+.bnav-item{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;padding:4px 8px;
+  transition:color .2s;
+}
+.bnav-item svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.bnav-item.active{color:var(--gold);}
+
+@media(max-width:768px){
+  nav.top-nav{padding:0 20px;}
+  .nav-links,.nav-right .lang-sw,.nav-right .btn-add-nav,.nav-right .btn-admin-nav{display:none;}
+  .burger{display:flex;}
+  .bottom-nav{display:flex;}
+  body{padding-bottom:58px;}
+}
+
+/* HERO SECTION */
+.hero-sec{
+  position:relative;min-height:100vh;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:110px 48px 80px;overflow:hidden;
+}
+.hero-sun{position:absolute;right:60px;top:50%;transform:translateY(-50%);width:460px;height:460px;opacity:.05;pointer-events:none;}
+.hero-content{position:relative;z-index:2;max-width:720px;}
+.since-row{display:flex;align-items:center;gap:10px;margin-bottom:26px;}
+.since-line{width:36px;height:1px;background:var(--gold);}
+.since-txt{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);}
+.hero-h1{font-family:'Playfair Display',serif;font-size:clamp(40px,6vw,80px);font-weight:900;line-height:1.0;letter-spacing:-.02em;margin-bottom:24px;}
+.hero-h1 em{display:block;color:var(--gold);font-style:italic;font-weight:400;}
+.hero-quote{font-size:15px;color:var(--muted);max-width:460px;line-height:1.75;margin-bottom:40px;padding-left:16px;border-left:2px solid var(--gold);}
+.hero-actions{display:flex;align-items:center;gap:20px;}
+.btn-archive{padding:13px 30px;background:none;border:1.5px solid var(--gold);color:var(--gold);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;border-radius:2px;cursor:pointer;transition:all .25s;}
+.btn-archive:hover{background:var(--gold);color:var(--ink);}
+.hero-num{display:flex;align-items:baseline;gap:6px;}
+.hero-num strong{font-family:'Playfair Display',serif;font-size:36px;color:#F5F3EE;}
+.hero-num span{font-size:13px;color:var(--muted);}
+.year-ticker{position:absolute;bottom:0;left:0;right:0;height:44px;border-top:1px solid var(--border);overflow:hidden;display:flex;align-items:center;}
+.year-inner{display:flex;gap:40px;animation:ytick 42s linear infinite;white-space:nowrap;}
+@keyframes ytick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.year-item{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(107,119,140,.4);}
+.year-item.gold{color:rgba(200,151,60,.5);font-weight:600;}
+
+/* TODAY IN HISTORY */
+.today-section{
+  background:linear-gradient(135deg,rgba(45,106,79,.15),rgba(200,151,60,.08));
+  border-top:1px solid rgba(45,106,79,.3);
+  border-bottom:1px solid rgba(45,106,79,.3);
+  padding:40px 48px;
+}
+.today-inner{display:flex;align-items:center;gap:32px;max-width:900px;}
+.today-icon{
+  font-size:36px;flex-shrink:0;
+  width:72px;height:72px;border-radius:50%;
+  background:rgba(45,106,79,.2);
+  border:1.5px solid rgba(45,106,79,.5);
+  display:flex;align-items:center;justify-content:center;
+}
+.today-label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#52b788;margin-bottom:6px;}
+.today-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:4px;}
+.today-sub{font-size:13px;color:var(--muted);}
+.today-empty{font-size:14px;color:var(--muted);font-style:italic;}
+.today-btn{
+  margin-left:auto;flex-shrink:0;
+  padding:10px 22px;background:none;
+  border:1px solid rgba(45,106,79,.5);color:#52b788;
+  border-radius:3px;font-size:12px;font-weight:600;letter-spacing:.08em;
+  cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.today-btn:hover{background:rgba(45,106,79,.2);}
+
+/* SECTION */
+.sec{padding:72px 48px;border-top:1px solid var(--border);position:relative;}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:32px;}
+.sec-tag{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);}
+.sec-title{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;}
+.sec-rule{flex:1;height:1px;background:var(--border);margin-left:10px;}
+
+/* FILTERS */
+.filter-wrap{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px;}
+.ftab{padding:7px 16px;background:none;border:1px solid var(--border);border-radius:20px;font-size:11px;letter-spacing:.06em;color:var(--muted);cursor:pointer;transition:all .2s;white-space:nowrap;}
+.ftab:hover{border-color:var(--gold);color:var(--gold);}
+.ftab.active{background:var(--gold);border-color:var(--gold);color:var(--ink);font-weight:600;}
+
+/* HERO GRID */
+.hero-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;}
+.empty{text-align:center;padding:80px 20px;color:var(--muted);}
+.empty-icon{font-size:48px;margin-bottom:16px;}
+
+/* HERO CARD */
+.hcard{background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden;cursor:pointer;transition:border-color .25s,transform .25s;position:relative;}
+.hcard:hover{border-color:rgba(200,151,60,.4);transform:translateY(-3px);}
+.hcard::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .35s ease;}
+.hcard:hover::after{transform:scaleX(1);}
+.hcard-photo{height:260px;position:relative;overflow:hidden;background:linear-gradient(160deg,#1A2535,#0C1420);display:flex;align-items:center;justify-content:center;}
+.hcard-photo img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;}
+.no-photo{display:flex;flex-direction:column;align-items:center;gap:12px;color:rgba(107,119,140,.4);}
+.no-photo span{font-size:11px;letter-spacing:.1em;text-transform:uppercase;}
+.svc-badge{position:absolute;top:12px;left:12px;padding:3px 9px;border-radius:2px;font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;}
+.year-badge{position:absolute;top:12px;right:12px;padding:3px 8px;border-radius:2px;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);font-size:10px;color:var(--muted);letter-spacing:.05em;}
+.hcard.today-hero{border-color:rgba(45,106,79,.5);}
+.hcard.today-hero::before{content:'📅 'attr(data-today-label);position:absolute;top:0;left:0;right:0;background:rgba(45,106,79,.7);text-align:center;font-size:11px;padding:5px;letter-spacing:.08em;z-index:5;color:#b7e4c7;}
+.hcard-body{padding:20px 22px 22px;}
+.hcard-name{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;margin-bottom:4px;line-height:1.25;}
+.hcard-desc{font-size:13px;color:rgba(237,233,224,.62);line-height:1.65;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:14px;}
+.hcard-foot{display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid var(--border);}
+.hcard-city{font-size:11px;color:var(--muted);}
+.hcard-actions{display:flex;align-items:center;gap:10px;}
+.hcard-more{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);cursor:pointer;}
+
+/* fatiha btn */
+.fatiha-btn{
+  display:flex;align-items:center;gap:5px;
+  background:none;border:1px solid rgba(45,106,79,.4);
+  border-radius:3px;padding:5px 10px;
+  font-size:11px;color:#52b788;cursor:pointer;
+  transition:all .2s;white-space:nowrap;
+}
+.fatiha-btn:hover{background:rgba(45,106,79,.15);}
+.fatiha-count{font-size:10px;color:rgba(82,183,136,.6);margin-left:2px;}
+
+/* badge colours */
+.s-fire{background:rgba(139,32,32,.65);color:#F48060;border:1px solid rgba(244,128,96,.25);}
+.s-police{background:rgba(28,58,130,.65);color:#7AAFF0;border:1px solid rgba(122,175,240,.25);}
+.s-military{background:rgba(28,80,40,.65);color:#7BD490;border:1px solid rgba(123,212,144,.25);}
+.s-rescue{background:rgba(100,68,10,.65);color:#E8C060;border:1px solid rgba(232,192,96,.25);}
+.s-nsc{background:rgba(80,20,100,.65);color:#C080F0;border:1px solid rgba(192,128,240,.25);}
+.s-border{background:rgba(20,80,100,.65);color:#60C0D8;border:1px solid rgba(96,192,216,.25);}
+.s-guard{background:rgba(80,60,20,.65);color:#D4A840;border:1px solid rgba(212,168,64,.25);}
+.s-prison{background:rgba(60,60,60,.65);color:#A0A8B8;border:1px solid rgba(160,168,184,.25);}
+.s-emergeny{background:rgba(139,60,20,.65);color:#F4A060;border:1px solid rgba(244,160,96,.25);}
+
+/* ARCHIVE LIST */
+.archive-list{display:flex;flex-direction:column;}
+
+/* ARCHIVE SEARCH */
+.archive-search-wrap{position:relative;margin-bottom:20px;}
+.archive-search{
+  width:100%;background:var(--panel);
+  border:1px solid rgba(255,255,255,.08);border-radius:3px;
+  padding:11px 42px 11px 16px;color:var(--cream);
+  font-size:14px;font-family:'Inter',sans-serif;
+  transition:border-color .2s;
+}
+.archive-search::placeholder{color:rgba(107,119,140,.5);}
+.archive-search:focus{outline:none;border-color:var(--gold);}
+.archive-search-icon{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  color:var(--muted);pointer-events:none;font-size:15px;
+}
+.archive-search-clear{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--muted);cursor:pointer;
+  font-size:16px;line-height:1;padding:2px;transition:color .2s;display:none;
+}
+.archive-search-clear:hover{color:var(--cream);}
+.archive-empty{padding:40px 0;text-align:center;color:var(--muted);font-size:14px;font-style:italic;}
+.arow{display:grid;grid-template-columns:48px 1fr auto;align-items:center;gap:18px;padding:16px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:all .15s;}
+.arow:hover{background:rgba(200,151,60,.03);padding-left:6px;}
+.arow-num{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:rgba(200,151,60,.18);text-align:right;line-height:1;}
+.arow-thumb{width:40px;height:40px;border-radius:50%;overflow:hidden;background:var(--card);flex-shrink:0;border:1px solid var(--border);}
+.arow-thumb img{width:100%;height:100%;object-fit:cover;object-position:top;}
+.arow-thumb .no-img{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:18px;color:rgba(107,119,140,.3);}
+.arow-info{display:flex;align-items:center;gap:12px;}
+.arow-text{display:flex;flex-direction:column;gap:2px;}
+.arow-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;}
+.arow-meta{font-size:11px;color:var(--muted);display:flex;gap:10px;}
+.arow-award{font-size:11px;color:var(--gold);}
+
+/* SUBMIT FORM */
+.submit-wrap{display:grid;grid-template-columns:1fr 1.1fr;gap:72px;align-items:start;}
+.step-list{display:flex;flex-direction:column;gap:16px;margin-top:24px;}
+.step{display:flex;align-items:flex-start;gap:14px;}
+.step-n{width:28px;height:28px;border:1px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--gold);flex-shrink:0;margin-top:1px;}
+.step-t strong{display:block;font-size:14px;margin-bottom:2px;color:#F5F3EE;}
+.step-t span{font-size:13px;color:var(--muted);line-height:1.5;}
+.sub-desc{font-size:14px;color:var(--muted);line-height:1.7;margin-top:12px;}
+.form{display:flex;flex-direction:column;gap:15px;}
+.fg{display:flex;flex-direction:column;gap:7px;}
+.flabel{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
+.fi,.fsel,.fta{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:3px;padding:12px 15px;color:var(--cream);font-size:14px;font-family:'Inter',sans-serif;transition:border-color .2s;}
+.fi::placeholder,.fta::placeholder{color:rgba(107,119,140,.55);}
+.fi:focus,.fsel:focus,.fta:focus{outline:none;border-color:var(--gold);}
+.fsel{appearance:none;}
+.fta{height:90px;resize:vertical;}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.photo-upload-box{border:1.5px dashed rgba(200,151,60,.35);border-radius:4px;padding:24px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.photo-upload-box:hover{border-color:var(--gold);background:rgba(200,151,60,.04);}
+.upload-preview{width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);margin:0 auto 10px;display:none;}
+.upload-icon{font-size:28px;margin-bottom:8px;}
+.upload-text strong{color:var(--gold);display:block;font-size:13px;margin-bottom:2px;}
+.upload-text{font-size:12px;color:var(--muted);line-height:1.5;}
+.btn-submit{padding:14px;background:var(--gold);color:var(--ink);border:none;border-radius:3px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:background .2s;margin-top:4px;}
+.btn-submit:hover{background:var(--gold2);}
+
+/* PENDING NOTICE BANNER */
+.pending-notice{
+  margin-top:20px;padding:16px 20px;
+  background:rgba(200,151,60,.07);
+  border:1px solid rgba(200,151,60,.2);
+  border-radius:4px;font-size:13px;color:var(--muted);line-height:1.6;
+}
+.pending-notice strong{color:var(--gold);}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:36px 48px;display:flex;align-items:center;justify-content:space-between;}
+.f-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;letter-spacing:.1em;}
+.f-logo span{color:var(--gold);}
+.f-copy{font-size:12px;color:var(--muted);text-align:center;max-width:300px;line-height:1.6;}
+.f-since{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:rgba(200,151,60,.18);}
+
+/* DETAIL MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:300;align-items:center;justify-content:center;padding:24px;}
+.overlay.open{display:flex;}
+.detail{background:var(--deep);border:1px solid rgba(200,151,60,.3);border-radius:6px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;position:relative;}
+.detail-img{width:100%;height:300px;object-fit:cover;object-position:top center;display:block;border-radius:5px 5px 0 0;}
+.detail-img-ph{width:100%;height:200px;background:linear-gradient(160deg,#1A2535,#0C1420);display:flex;align-items:center;justify-content:center;border-radius:5px 5px 0 0;}
+.detail-body{padding:28px 32px 32px;}
+.detail-close{position:absolute;top:14px;right:14px;background:rgba(0,0,0,.6);border:none;color:#F5F3EE;width:36px;height:36px;border-radius:50%;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;touch-action:manipulation;}
+.detail-name{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin:12px 0 4px;}
+.detail-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
+.detail-desc{font-size:14px;line-height:1.8;margin-bottom:20px;}
+.detail-award{font-size:13px;color:var(--gold);margin-bottom:20px;}
+.detail-actions{display:flex;gap:10px;flex-wrap:wrap;padding-top:20px;border-top:1px solid var(--border);}
+.detail-share-btn{padding:9px 18px;background:none;border:1px solid var(--border);border-radius:3px;font-size:12px;color:var(--cream);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;}
+.detail-share-btn:hover{border-color:var(--gold);color:var(--gold);}
+.detail-fatiha-btn{padding:9px 18px;background:rgba(45,106,79,.15);border:1px solid rgba(45,106,79,.4);border-radius:3px;font-size:12px;color:#52b788;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;}
+.detail-fatiha-btn:hover{background:rgba(45,106,79,.25);}
+/* admin delete button in detail */
+.detail-delete-btn{padding:9px 18px;background:rgba(139,32,32,.15);border:1px solid rgba(139,32,32,.4);border-radius:3px;font-size:12px;color:#F48060;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;margin-left:auto;}
+.detail-delete-btn:hover{background:rgba(139,32,32,.3);}
+
+/* FATIHAH MODAL */
+.fatiha-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:400;align-items:center;justify-content:center;padding:24px;}
+.fatiha-overlay.open{display:flex;}
+.fatiha-box{background:var(--deep);border:1px solid rgba(45,106,79,.4);border-radius:8px;width:100%;max-width:520px;padding:40px;text-align:center;position:relative;}
+.fatiha-close{position:absolute;top:14px;right:18px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;}
+.fatiha-arabic{font-size:28px;line-height:1.9;color:var(--cream);direction:rtl;margin-bottom:20px;font-family:serif;letter-spacing:.05em;}
+.fatiha-translation{font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:24px;text-align:left;}
+.fatiha-for{font-size:12px;color:rgba(82,183,136,.7);margin-bottom:4px;letter-spacing:.08em;}
+.fatiha-hero-name{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--cream);margin-bottom:20px;}
+.fatiha-counter{display:inline-flex;align-items:center;gap:8px;background:rgba(45,106,79,.15);border:1px solid rgba(45,106,79,.3);border-radius:4px;padding:8px 18px;font-size:14px;color:#52b788;margin-bottom:20px;}
+.btn-fatiha-read{padding:14px 32px;background:rgba(45,106,79,.2);border:1.5px solid rgba(45,106,79,.6);color:#52b788;border-radius:4px;font-size:14px;font-weight:600;cursor:pointer;transition:all .25s;width:100%;}
+.btn-fatiha-read:hover:not(:disabled){background:rgba(45,106,79,.35);}
+.btn-fatiha-read.read{background:rgba(45,106,79,.35);border-color:rgba(45,106,79,.8);}
+.btn-fatiha-read:disabled{opacity:.6;cursor:default;}
+
+/* ADMIN LOGIN MODAL */
+.admin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;align-items:center;justify-content:center;padding:24px;}
+.admin-overlay.open{display:flex;}
+.admin-box{background:var(--deep);border:1px solid rgba(200,151,60,.3);border-radius:8px;width:100%;max-width:400px;padding:40px;position:relative;}
+.admin-box h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:6px;}
+.admin-box p{font-size:13px;color:var(--muted);margin-bottom:28px;}
+.admin-close{position:absolute;top:14px;right:18px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;}
+.admin-error{font-size:12px;color:#F48060;margin-top:8px;display:none;}
+
+/* ADMIN PANEL */
+.admin-panel{
+  position:fixed;bottom:80px;right:24px;z-index:180;
+  background:var(--deep);border:1px solid rgba(200,151,60,.3);
+  border-radius:8px;width:360px;max-height:60vh;overflow:hidden;
+  display:none;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.admin-panel.open{display:flex;}
+.admin-panel-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.admin-panel-head h3{font-size:14px;font-weight:700;color:var(--gold);}
+.admin-panel-tabs{display:flex;border-bottom:1px solid var(--border);}
+.apanel-tab{flex:1;padding:10px;background:none;border:none;font-size:11px;letter-spacing:.08em;color:var(--muted);cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;}
+.apanel-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.admin-panel-body{flex:1;overflow-y:auto;padding:12px;}
+.pending-item{padding:12px;border-bottom:1px solid var(--border);}
+.pending-item-name{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:2px;}
+.pending-item-meta{font-size:11px;color:var(--muted);margin-bottom:10px;}
+.pending-item-actions{display:flex;gap:8px;}
+.btn-approve{padding:6px 14px;background:rgba(45,106,79,.2);border:1px solid rgba(45,106,79,.5);color:#52b788;border-radius:3px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;}
+.btn-approve:hover{background:rgba(45,106,79,.4);}
+.btn-reject{padding:6px 14px;background:rgba(139,32,32,.15);border:1px solid rgba(139,32,32,.4);color:#F48060;border-radius:3px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;}
+.btn-reject:hover{background:rgba(139,32,32,.3);}
+.admin-hero-item{padding:10px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.admin-hero-item-name{font-size:13px;font-weight:600;flex:1;}
+.btn-delete-hero{padding:5px 10px;background:rgba(139,32,32,.15);border:1px solid rgba(139,32,32,.3);color:#F48060;border-radius:3px;font-size:10px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.btn-delete-hero:hover{background:rgba(139,32,32,.3);}
+.badge-count{display:inline-block;background:var(--red);color:white;border-radius:10px;font-size:9px;font-weight:700;padding:1px 6px;margin-left:4px;vertical-align:middle;}
+.logout-btn{padding:6px 14px;background:none;border:1px solid rgba(200,151,60,.3);color:var(--muted);border-radius:3px;font-size:11px;cursor:pointer;transition:all .2s;}
+.logout-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:12px 24px;font-size:13px;opacity:0;transition:all .3s;z-index:600;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* SHARE CANVAS */
+#share-canvas{position:fixed;top:-9999px;left:-9999px;}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE  — mobile-first breakpoints
+   320px  xs  (small phone)
+   480px  sm  (phone landscape / large phone)
+   768px  md  (tablet portrait)
+   1024px lg  (tablet landscape / small laptop)
+   1280px xl  (desktop)
+   1600px 2xl (wide desktop)
+   ══════════════════════════════════════════ */
+
+/* ── DESKTOP baseline tweaks (>1280px) ── */
+@media(min-width:1280px){
+  .hero-sec{padding:130px 80px 100px;}
+  .hero-h1{font-size:88px;}
+  .hero-sun{width:520px;height:520px;right:80px;}
+  .sec{padding:80px 80px;}
+  .today-section{padding:44px 80px;}
+  footer{padding:40px 80px;}
+  .hero-grid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));}
+}
+@media(min-width:1600px){
+  .hero-sec{padding:140px 120px 110px;}
+  .sec{padding:90px 120px;}
+  .today-section{padding:48px 120px;}
+  footer{padding:44px 120px;}
+  .hero-grid{grid-template-columns:repeat(auto-fill,minmax(320px,1fr));}
+}
+
+/* ── TABLET landscape (1024px) ── */
+@media(max-width:1024px){
+  nav.top-nav{padding:0 28px;}
+  .hero-sec{padding:100px 32px 80px;}
+  .hero-sun{width:360px;height:360px;right:32px;opacity:.04;}
+  .sec{padding:56px 32px;}
+  .today-section{padding:32px 32px;}
+  footer{padding:32px 32px;}
+  .submit-wrap{grid-template-columns:1fr 1fr;gap:40px;}
+}
+
+/* ── TABLET portrait (768px) ── */
+@media(max-width:768px){
+  /* nav */
+  nav.top-nav{padding:0 20px;height:56px;}
+  .nav-links,.nav-right .lang-sw,.nav-right .btn-add-nav,.nav-right .btn-admin-nav{display:none;}
+  .burger{display:flex;}
+
+  /* bottom nav shown */
+  .bottom-nav{display:flex;}
+  body{padding-bottom:60px;}
+
+  /* hero */
+  .hero-sec{padding:80px 20px 72px;min-height:auto;}
+  .hero-sun{display:none;}
+  .hero-h1{font-size:clamp(36px,10vw,60px);}
+  .hero-quote{font-size:14px;max-width:100%;}
+  .hero-actions{flex-wrap:wrap;gap:14px;}
+  .btn-archive{padding:12px 24px;font-size:11px;}
+  .year-ticker{height:38px;}
+
+  /* today */
+  .today-section{padding:24px 20px;}
+  .today-inner{flex-direction:column;align-items:flex-start;gap:14px;}
+  .today-icon{width:56px;height:56px;font-size:26px;}
+  .today-btn{margin-left:0;width:100%;}
+  .today-name{font-size:18px;}
+
+  /* sections */
+  .sec{padding:40px 20px;}
+  .sec-title{font-size:24px;}
+
+  /* filter tabs — horizontal scroll */
+  .filter-wrap{flex-wrap:nowrap;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .filter-wrap::-webkit-scrollbar{display:none;}
+  .ftab{flex-shrink:0;}
+
+  /* grid — 2 col on tablet */
+  .hero-grid{grid-template-columns:repeat(2,1fr);gap:14px;}
+  .hcard-photo{height:200px;}
+
+  /* archive rows */
+  .arow{grid-template-columns:36px 1fr auto;gap:12px;padding:13px 0;}
+  .arow-num{font-size:18px;}
+  .arow-name{font-size:15px;}
+
+  /* submit form */
+  .submit-wrap{grid-template-columns:1fr;gap:32px;}
+  .f2{grid-template-columns:1fr;}
+
+  /* modals */
+  .overlay{padding:0;align-items:flex-end;}
+  .detail{max-width:100%;border-radius:14px 14px 0 0;max-height:92vh;}
+  .detail-img{height:220px;}
+  .detail-body{padding:20px 20px 28px;}
+  .detail-name{font-size:22px;}
+  .detail-actions{gap:8px;}
+  .detail-share-btn,.detail-fatiha-btn,.detail-delete-btn{padding:10px 14px;font-size:12px;flex:1;justify-content:center;}
+
+  .fatiha-overlay{padding:0;align-items:flex-end;}
+  .fatiha-box{border-radius:14px 14px 0 0;max-width:100%;padding:28px 20px 32px;max-height:90vh;overflow-y:auto;}
+  .fatiha-arabic{font-size:22px;line-height:1.8;}
+
+  .admin-overlay{padding:0;align-items:flex-end;}
+  .admin-box{border-radius:14px 14px 0 0;max-width:100%;padding:28px 20px 32px;}
+
+  /* admin panel */
+  .admin-panel{width:calc(100vw - 24px);right:12px;bottom:70px;max-height:55vh;}
+
+  /* footer */
+  footer{flex-direction:column;gap:14px;text-align:center;padding:28px 20px;}
+  .f-copy{max-width:100%;}
+
+  /* toast above bottom nav */
+  .toast{bottom:72px;}
+}
+
+/* ── PHONE (480px) ── */
+@media(max-width:480px){
+  .hero-sec{padding:72px 16px 64px;}
+  .hero-h1{font-size:clamp(32px,11vw,48px);}
+  .since-txt{font-size:9px;letter-spacing:.14em;}
+  .hero-quote{font-size:13px;}
+
+  .today-section{padding:20px 16px;}
+
+  .sec{padding:32px 16px;}
+  .sec-title{font-size:21px;}
+
+  /* grid — 1 col on small phones */
+  .hero-grid{grid-template-columns:1fr;gap:12px;}
+  .hcard-photo{height:240px;}
+
+  /* archive */
+  .arow{grid-template-columns:28px 1fr;gap:10px;}
+  .arow-num{font-size:15px;}
+  .arow-award{display:none;}/* hide award col on tiny screens */
+
+  /* filter tabs */
+  .ftab{font-size:10px;padding:6px 12px;}
+
+  /* form */
+  .photo-upload-box{padding:18px;}
+  .fi,.fsel,.fta{font-size:15px;} /* prevent iOS zoom on focus */
+  .btn-submit{font-size:13px;padding:15px;}
+
+  /* bottom nav labels */
+  .bnav-item{font-size:8px;gap:3px;}
+  .bnav-item svg{width:18px;height:18px;}
+
+  /* modals full screen on very small */
+  .detail{max-height:96vh;}
+  .fatiha-arabic{font-size:19px;}
+
+  footer{padding:24px 16px;}
+}
+
+/* ── VERY SMALL (320px) ── */
+@media(max-width:360px){
+  .hero-h1{font-size:30px;}
+  .btn-archive{width:100%;text-align:center;}
+  .hero-actions{flex-direction:column;align-items:flex-start;}
+  .hcard-body{padding:14px 16px 16px;}
+  .hcard-name{font-size:16px;}
+}
+
+/* ── Touch friendly tap targets ── */
+@media(hover:none){
+  .ftab{min-height:40px;display:flex;align-items:center;}
+  .fatiha-btn{min-height:38px;}
+  .hcard-more{padding:4px 0;}
+  .btn-approve,.btn-reject,.btn-delete-hero{min-height:36px;}
+  /* remove hover transforms on touch */
+  .hcard:hover{transform:none;}
+}
+/* ── ABOUT SECTION BLOCKS ── */
+.about-block{position:relative;z-index:2;padding:72px 48px;border-bottom:1px solid var(--border);}
+.about-intro{border-top:1px solid var(--border);border-bottom:1px solid rgba(200,151,60,.15);background:linear-gradient(180deg,rgba(200,151,60,.04) 0%,transparent 100%);}
+.about-facts-inner{max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;}
+.about-cta{border-bottom:1px solid var(--border);}
+
+@media(max-width:768px){
+  .about-block{padding:40px 20px;}
+  .about-facts-inner{grid-template-columns:1fr;gap:32px;}
+}
+@media(max-width:480px){
+  .about-block{padding:32px 16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <a class="nav-logo" href="#">
+    <div class="nav-emblem">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M9 1L11.5 6.5L17 7.5L13 11.5L14 17L9 14L4 17L5 11.5L1 7.5L6.5 6.5Z" stroke="#C8973C" stroke-width="1.2" fill="none"/>
+      </svg>
+    </div>
+    <span class="nav-name"><span>ЕРЛ</span>ЕР</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#heroes" data-ru="Мемориал" data-kz="Мемориал">Мемориал</a></li>
+    <li><a href="#archive" data-ru="Архив" data-kz="Мұрағат">Архив</a></li>
+    <li><a href="#submit" data-ru="Добавить" data-kz="Қосу">Добавить</a></li>
+    <li><a href="#about" data-ru="О проекте" data-kz="Жоба туралы">О проекте</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="lang-sw">
+      <button class="lbtn active" id="lru" onclick="setLang('ru')">РУС</button>
+      <button class="lbtn" id="lkz" onclick="setLang('kz')">ҚАЗ</button>
+    </div>
+    <button class="btn-admin-nav" id="btn-admin-nav" onclick="openAdminLogin()">⚙ Admin</button>
+    <button class="btn-add-nav" onclick="gotoSection('submit')" data-ru="+ ДОБАВИТЬ" data-kz="+ ҚОСУ">+ ДОБАВИТЬ</button>
+  </div>
+  <button class="burger" id="burger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#heroes" onclick="closeMenu()" data-ru="Мемориал" data-kz="Мемориал">Мемориал</a>
+  <a href="#archive" onclick="closeMenu()" data-ru="Архив" data-kz="Мұрағат">Архив</a>
+  <a href="#submit" onclick="closeMenu()" data-ru="Добавить героя" data-kz="Батыр қосу">Добавить героя</a>
+  <a href="#about" onclick="closeMenu()" data-ru="О проекте" data-kz="Жоба туралы">О проекте</a>
+  <div class="mobile-menu-lang">
+    <button onclick="setLang('ru');closeMenu()" id="mlru" class="active">РУС</button>
+    <button onclick="setLang('kz');closeMenu()" id="mlkz">ҚАЗ</button>
+  </div>
+  <button class="mobile-menu-add" onclick="gotoSection('submit');closeMenu()" data-ru="+ ДОБАВИТЬ ГЕРОЯ" data-kz="+ БАТЫР ҚОСУ">+ ДОБАВИТЬ ГЕРОЯ</button>
+</div>
+
+<!-- BOTTOM NAV (mobile) -->
+<nav class="bottom-nav">
+  <a class="bnav-item active" href="#" id="bn-home">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span data-ru="Главная" data-kz="Басты">Главная</span>
+  </a>
+  <a class="bnav-item" href="#heroes" id="bn-archive">
+    <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    <span data-ru="Архив" data-kz="Мұрағат">Архив</span>
+  </a>
+  <a class="bnav-item" href="#submit" id="bn-add">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    <span data-ru="Добавить" data-kz="Қосу">Добавить</span>
+  </a>
+  <a class="bnav-item" href="#about" id="bn-about">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    <span data-ru="О нас" data-kz="Біз туралы">О нас</span>
+  </a>
+</nav>
+
+<!-- HERO SECTION -->
+<section class="hero-sec">
+  <div class="ornament-bg"></div>
+  <svg class="hero-sun" viewBox="0 0 460 460" fill="none">
+    <circle cx="230" cy="230" r="180" stroke="#C8973C" stroke-width=".8"/>
+    <circle cx="230" cy="230" r="110" stroke="#C8973C" stroke-width=".6"/>
+    <circle cx="230" cy="230" r="42" fill="#C8973C" opacity=".35"/>
+    <line x1="230" y1="48" x2="230" y2="8" stroke="#C8973C" stroke-width="2.2"/>
+    <line x1="350" y1="110" x2="378" y2="82" stroke="#C8973C" stroke-width="2.2"/>
+    <line x1="412" y1="230" x2="452" y2="230" stroke="#C8973C" stroke-width="2.2"/>
+    <line x1="350" y1="350" x2="378" y2="378" stroke="#C8973C" stroke-width="2.2"/>
+    <line x1="230" y1="412" x2="230" y2="452" stroke="#C8973C" stroke-width="2.2"/>
+    <line x1="110" y1="350" x2="82" y2="378" stroke="#C8973C" stroke-width="2.2"/>
+    <line x1="48" y1="230" x2="8" y2="230" stroke="#C8973C" stroke-width="2.2"/>
+    <line x1="110" y1="110" x2="82" y2="82" stroke="#C8973C" stroke-width="2.2"/>
+  </svg>
+  <div class="hero-content">
+    <div class="since-row">
+      <span class="since-line"></span>
+      <span class="since-txt" data-ru="С момента независимости · 16 декабря 1991" data-kz="Тәуелсіздіктен бері · 16 желтоқсан 1991">С момента независимости · 16 декабря 1991</span>
+    </div>
+    <h1 class="hero-h1">
+      <span id="h1a" data-ru="МЫ ПОМНИМ" data-kz="БІЗ ЕСТЕ САҚТАЙМЫЗ">МЫ ПОМНИМ</span><br>
+      <em id="h1b" data-ru="их жертву" data-kz="олардың құрбандығын">их жертву</em>
+    </h1>
+    <p class="hero-quote" id="hero-q"
+      data-ru="Каждый год пожарные, полицейские, военные и сотрудники всех силовых структур Казахстана отдают жизни на службе. Эта база — наша общая память о каждом из них."
+      data-kz="Жыл сайын өрт сөндірушілер, полицейлер, әскери қызметкерлер және Қазақстанның барлық күш құрылымдарының қызметкерлері қызмет атқара отырып өмірін қиады. Бұл база — олардың әрқайсысы туралы ортақ жадымыз.">
+      Каждый год пожарные, полицейские, военные и сотрудники всех силовых структур Казахстана отдают жизни на службе. Эта база — наша общая память о каждом из них.
+    </p>
+    <div class="hero-actions">
+      <button class="btn-archive" onclick="gotoSection('heroes')" id="btn-arc" data-ru="ОТКРЫТЬ АРХИВ" data-kz="МҰРАҒАТТЫ АШУ">ОТКРЫТЬ АРХИВ</button>
+      <div class="hero-num">
+        <strong id="hnum">0</strong>
+        <span id="hnum-lbl">записей</span>
+      </div>
+    </div>
+  </div>
+  <div class="year-ticker"><div class="year-inner" id="yticker"></div></div>
+</section>
+
+<!-- TODAY IN HISTORY -->
+<div class="today-section" id="today-section">
+  <div class="today-inner" id="today-inner">
+    <div class="today-icon">📅</div>
+    <div id="today-content">
+      <div class="today-label" id="today-label">СЕГОДНЯ В ИСТОРИИ</div>
+      <div id="today-body"><div class="today-empty" id="today-empty">В этот день нет совпадений в базе</div></div>
+    </div>
+    <button class="today-btn" id="today-fatiha-btn" style="display:none" onclick="openFatihaById(0)">🤲 Прочитать Фатиху</button>
+  </div>
+</div>
+
+<!-- HEROES -->
+<section class="sec" id="heroes">
+  <div class="sec-head">
+    <span class="sec-tag" data-ru="МЕМОРИАЛ" data-kz="МЕМОРИАЛ">МЕМОРИАЛ</span>
+    <h2 class="sec-title" data-ru="Герои Казахстана" data-kz="Қазақстан батырлары">Герои Казахстана</h2>
+    <div class="sec-rule"></div>
+  </div>
+  <div class="filter-wrap" id="filter-wrap">
+    <button class="ftab active" onclick="setFilter('all',this)" data-ru="Все структуры" data-kz="Барлық құрылымдар">Все структуры</button>
+    <button class="ftab" onclick="setFilter('fire',this)" data-ru="🔥 МЧС / Пожарные" data-kz="🔥 МТЖ / Өрт сөндіру">🔥 МЧС / Пожарные</button>
+    <button class="ftab" onclick="setFilter('police',this)" data-ru="🛡 МВД / Полиция" data-kz="🛡 ІІМ / Полиция">🛡 МВД / Полиция</button>
+    <button class="ftab" onclick="setFilter('military',this)" data-ru="⚔️ Вооружённые силы" data-kz="⚔️ Қарулы күштер">⚔️ Вооружённые силы</button>
+    <button class="ftab" onclick="setFilter('rescue',this)" data-ru="🚁 Спасатели" data-kz="🚁 Құтқарушылар">🚁 Спасатели</button>
+    <button class="ftab" onclick="setFilter('nsc',this)" data-ru="🔵 КНБ" data-kz="🔵 ҰҚК">🔵 КНБ</button>
+    <button class="ftab" onclick="setFilter('border',this)" data-ru="🟦 Погранслужба" data-kz="🟦 Шекара қызметі">🟦 Погранслужба</button>
+    <button class="ftab" onclick="setFilter('guard',this)" data-ru="🟡 Нацгвардия" data-kz="🟡 Ұлттық гвардия">🟡 Нацгвардия</button>
+    <button class="ftab" onclick="setFilter('prison',this)" data-ru="⚫ КУИС" data-kz="⚫ ҚУІҚК">⚫ КУИС</button>
+    <button class="ftab" onclick="setFilter('emergency',this)" data-ru="🟠 Гражданская защита" data-kz="🟠 Азаматтық қорғаныс">🟠 Гражданская защита</button>
+  </div>
+  <div class="hero-grid" id="hero-grid"></div>
+</section>
+
+<!-- ARCHIVE -->
+<section class="sec" id="archive">
+  <div class="sec-head">
+    <span class="sec-tag" data-ru="АРХИВ" data-kz="ТІЗІМ">АРХИВ</span>
+    <h2 class="sec-title" data-ru="Все записи" data-kz="Барлық жазбалар">Все записи</h2>
+    <div class="sec-rule"></div>
+  </div>
+  <div class="archive-search-wrap">
+    <input class="archive-search" id="archive-search" type="text"
+      placeholder="Поиск по имени..." autocomplete="off"
+      oninput="onArchiveSearch(this.value)">
+    <span class="archive-search-icon" id="archive-search-icon">⌕</span>
+    <button class="archive-search-clear" id="archive-search-clear" onclick="clearArchiveSearch()">✕</button>
+  </div>
+  <div class="archive-list" id="archive-list"></div>
+</section>
+
+<!-- SUBMIT -->
+<section class="sec" id="submit">
+  <div class="submit-wrap">
+    <div>
+      <div class="sec-head">
+        <span class="sec-tag" data-ru="УЧАСТИЕ" data-kz="ҚАТЫСУ">УЧАСТИЕ</span>
+        <h2 class="sec-title" data-ru="Добавить героя" data-kz="Батыр қосу">Добавить героя</h2>
+      </div>
+      <p class="sub-desc" data-ru="Знаете имя, которого нет в базе? Заполните форму — каждая запись проверяется модератором перед публикацией." data-kz="Базада жоқ атты білесіз бе? Пішінді толтырыңыз — жариялаудан бұрын тексеріледі.">
+        Знаете имя, которого нет в базе? Заполните форму — каждая запись проверяется модератором перед публикацией.
+      </p>
+      <div class="step-list">
+        <div class="step"><div class="step-n">1</div><div class="step-t"><strong data-ru="Заполните форму и прикрепите фото" data-kz="Пішін толтырып, фото тіркеңіз">Заполните форму и прикрепите фото</strong><span data-ru="Имя, структура, годы, описание" data-kz="Аты, құрылым, жылдары, сипаттама">Имя, структура, годы, описание</span></div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-t"><strong data-ru="Проверка модератором" data-kz="Модератор тексеруі">Проверка модератором</strong><span data-ru="Запись проверяется перед публикацией" data-kz="Жазба жариялаудан бұрын тексеріледі">Запись проверяется перед публикацией</span></div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-t"><strong data-ru="Имя остаётся навсегда" data-kz="Есім мәңгі қалады">Имя остаётся навсегда</strong><span data-ru="Герой появляется в открытой базе" data-kz="Батыр ашық базада пайда болады">Герой появляется в открытой базе</span></div></div>
+      </div>
+    </div>
+    <div class="form">
+      <div class="fg">
+        <label class="flabel" data-ru="Фотография героя" data-kz="Батырдың фотосуреті">Фотография героя</label>
+        <div class="photo-upload-box" onclick="document.getElementById('photo-input').click()">
+          <input type="file" id="photo-input" accept="image/*" onchange="handlePhoto(event)" style="display:none">
+          <img class="upload-preview" id="upload-preview" src="" alt="">
+          <div id="upload-ph">
+            <div class="upload-icon">📷</div>
+            <div class="upload-text">
+              <strong data-ru="Нажмите чтобы загрузить фото" data-kz="Фото жүктеу үшін басыңыз">Нажмите чтобы загрузить фото</strong>
+              <span data-ru="JPG, PNG · до 5 МБ" data-kz="JPG, PNG · 5 МБ-қа дейін">JPG, PNG · до 5 МБ</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="f2">
+        <div class="fg"><label class="flabel" data-ru="Имя и фамилия" data-kz="Аты-жөні">Имя и фамилия</label><input class="fi" id="fn" type="text" placeholder="Алибек Жумабеков"></div>
+        <div class="fg"><label class="flabel" data-ru="Дата гибели" data-kz="Қаза болған күн">Дата гибели</label><input class="fi" id="fy" type="text" placeholder="24.06.2022"></div>
+      </div>
+      <div class="f2">
+        <div class="fg">
+          <label class="flabel" data-ru="Силовая структура" data-kz="Күш құрылымы">Силовая структура</label>
+          <select class="fsel" id="ft">
+            <option value="fire">🔥 МЧС / Пожарные</option>
+            <option value="police">🛡 МВД / Полиция</option>
+            <option value="military">⚔️ Вооружённые силы</option>
+            <option value="rescue">🚁 Спасатели</option>
+            <option value="nsc">🔵 КНБ</option>
+            <option value="border">🟦 Пограничная служба</option>
+            <option value="guard">🟡 Национальная гвардия</option>
+            <option value="prison">⚫ КУИС</option>
+            <option value="emergency">🟠 Гражданская защита</option>
+          </select>
+        </div>
+        <div class="fg"><label class="flabel" data-ru="Город / Регион" data-kz="Қала / Өңір">Город / Регион</label><input class="fi" id="fc" type="text" placeholder="Алматы"></div>
+      </div>
+      <div class="fg"><label class="flabel" data-ru="Описание подвига" data-kz="Ерлік сипаттамасы">Описание подвига</label><textarea class="fta" id="fd" placeholder="Опишите обстоятельства гибели при исполнении долга..."></textarea></div>
+      <div class="f2">
+        <div class="fg"><label class="flabel" data-ru="Награда" data-kz="Марапат">Награда</label><input class="fi" id="fa" type="text" placeholder="Орден Айбын..."></div>
+        <div class="fg"><label class="flabel" data-ru="Источник / Ссылка" data-kz="Дерек / Сілтеме">Источник / Ссылка</label><input class="fi" id="fs" type="text" placeholder="https://..."></div>
+      </div>
+      <button class="btn-submit" onclick="submitHero()" data-ru="ОТПРАВИТЬ НА ПРОВЕРКУ" data-kz="ТЕКСЕРУГЕ ЖІБЕРУ">ОТПРАВИТЬ НА ПРОВЕРКУ</button>
+      <div class="pending-notice">
+        <strong>⏳ Как работает проверка?</strong><br>
+        После отправки запись попадает к модератору. Только после проверки имя героя появится в базе. Обычно это занимает 1–2 дня.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" style="position:relative;overflow:hidden;background:var(--ink);">
+  <div class="ornament-bg"></div>
+  <div class="about-block about-intro">
+    <div style="max-width:760px;margin:0 auto;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:40px;">
+        <span style="font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);" data-ru="О ПРОЕКТЕ" data-kz="ЖОБА ТУРАЛЫ">О ПРОЕКТЕ</span>
+        <span style="flex:1;height:1px;background:rgba(200,151,60,.2);"></span>
+        <span style="font-size:11px;color:var(--muted);">ЕРЛЕР · 1991 —</span>
+      </div>
+      <p style="font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,48px);font-weight:400;line-height:1.3;color:var(--cream);margin-bottom:32px;"
+        data-ru="Каждый день в Казахстане кто-то надевает форму и уходит на службу.<br>Некоторые не возвращаются."
+        data-kz="Қазақстанда күн сайын кімдір бірі форма киіп, қызметке кетеді.<br>Кейбіреулері оралмайды.">
+        Каждый день в Казахстане кто-то надевает форму и уходит на службу.<br>Некоторые не возвращаются.
+      </p>
+      <p style="font-size:clamp(14px,2vw,17px);color:var(--muted);line-height:1.9;margin-bottom:32px;max-width:620px;"
+        data-ru="Пожарный, вошедший в горящий дом. Полицейский, закрывший собой случайного прохожего. Военный, выполнивший приказ до конца. Спасатель, достающий людей из-под завалов и не успевший выбраться сам."
+        data-kz="Өртке оранған үйге кірген өртсөндіруші. Кездейсоқ жолаушыны денесімен жапқан полицей. Бұйрықты соңына дейін орындаған әскери. Қалдықтардан адамдарды шығарып, өзі шыға алмай қалған құтқарушы.">
+        Пожарный, вошедший в горящий дом. Полицейский, закрывший собой случайного прохожего. Военный, выполнивший приказ до конца. Спасатель, достающий людей из-под завалов и не успевший выбраться сам.
+      </p>
+      <div style="display:flex;align-items:center;gap:20px;margin:40px 0;flex-wrap:wrap;">
+        <span style="flex:1;height:1px;background:var(--border);min-width:20px;"></span>
+        <span style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(200,151,60,.5);text-align:center;" data-ru="Их имена заслуживают большего, чем строчка в официальном отчёте" data-kz="Олардың есімдері ресми есептегі жолдан артықты лайық">Их имена заслуживают большего, чем строчка в официальном отчёте</span>
+        <span style="flex:1;height:1px;background:var(--border);min-width:20px;"></span>
+      </div>
+      <p style="font-size:clamp(14px,2vw,17px);color:var(--muted);line-height:1.9;max-width:620px;"
+        data-ru="С 16 декабря 1991 года Казахстан пишет собственную военную историю. Тихую. Без фронтов и салютов. И никто её системно не записывает."
+        data-kz="1991 жылғы 16 желтоқсаннан бастап Қазақстан өзінің тыныш әскери тарихын жазуда. Және оны ешкім жүйелі түрде жазбайды.">
+        С 16 декабря 1991 года Казахстан пишет собственную военную историю. Тихую. Без фронтов и салютов. И никто её системно не записывает.
+      </p>
+    </div>
+  </div>
+  <div class="about-block about-facts">
+    <div class="about-facts-inner">
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:clamp(60px,12vw,160px);font-weight:900;line-height:1;color:transparent;-webkit-text-stroke:1px rgba(200,151,60,.25);letter-spacing:-.03em;">1991</div>
+        <p style="font-size:13px;color:var(--muted);margin-top:16px;line-height:1.7;" data-ru="Год, с которого начинается эта летопись. Каждый, кто погиб при исполнении долга, должен быть здесь." data-kz="Бұл жылнама басталатын жыл. Міндетін атқарып қаза тапқан әрбір адам осында болуы керек.">Год, с которого начинается эта летопись. Каждый, кто погиб при исполнении долга, должен быть здесь.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:28px;">
+        <div style="padding-bottom:28px;border-bottom:1px solid var(--border);">
+          <div style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;" data-ru="ЧТО ЭТО" data-kz="БҰЛ НЕ">ЧТО ЭТО</div>
+          <p style="font-size:15px;line-height:1.75;color:var(--cream);" data-ru="Открытая цифровая база памяти. Не государственная. Не официальная. Народная." data-kz="Ашық сандық жады базасы. Мемлекеттік емес. Ресми емес. Халықтық.">Открытая цифровая база памяти. Не государственная. Не официальная. Народная.</p>
+        </div>
+        <div style="padding-bottom:28px;border-bottom:1px solid var(--border);">
+          <div style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;" data-ru="ДЛЯ КОГО" data-kz="КІМ ҮШІН">ДЛЯ КОГО</div>
+          <p style="font-size:15px;line-height:1.75;color:var(--cream);" data-ru="Для детей, которые должны знать настоящих героев. Для семей, которые хотят, чтобы имя их близкого не забылось. Для всех нас." data-kz="Нағыз батырларды білуі тиіс балалар үшін. Олардың барлығымыз үшін.">Для детей, которые должны знать настоящих героев. Для семей, которые хотят, чтобы имя их близкого не забылось. Для всех нас.</p>
+        </div>
+        <div>
+          <div style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;" data-ru="ПОЧЕМУ СЕЙЧАС" data-kz="НЕЛІКТЕН ҚАЗІР">ПОЧЕМУ СЕЙЧАС</div>
+          <p style="font-size:15px;line-height:1.75;color:var(--cream);" data-ru="Потому что через 20 лет эти имена могут исчезнуть навсегда. Память не хранит себя сама." data-kz="Өйткені 20 жылдан кейін бұл есімдер мәңгілікке жоғалып кетуі мүмкін. Жады өзін өзі сақтамайды.">Потому что через 20 лет эти имена могут исчезнуть навсегда. Память не хранит себя сама.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="about-block about-cta" style="text-align:center;">
+    <p style="font-family:'Playfair Display',serif;font-size:clamp(17px,3vw,36px);font-weight:400;font-style:italic;line-height:1.5;color:rgba(237,233,224,.6);max-width:700px;margin:0 auto 40px;"
+      data-ru="«Государство чтит героев официально — приказами и некрологами. Но народная память — это другое. Это когда люди сами приходят, сами читают Фатиху и сами не забывают.»"
+      data-kz="«Мемлекет батырларды ресми түрде құрметтейді. Бірақ халықтық жады — бұл адамдар өздері келгенде, өздері Фатиха оқығанда.»">
+      «Государство чтит героев официально — приказами и некрологами. Но народная память — это другое. Это когда люди сами приходят, сами читают Фатиху и сами не забывают.»
+    </p>
+    <button onclick="gotoSection('submit')"
+      style="padding:14px 40px;background:none;border:1.5px solid var(--gold);color:var(--gold);font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;border-radius:2px;cursor:pointer;transition:all .25s;"
+      onmouseover="this.style.background='#C8973C';this.style.color='#090D13'"
+      onmouseout="this.style.background='none';this.style.color='#C8973C'"
+      data-ru="ДОБАВИТЬ ИМЯ В БАЗУ" data-kz="БАЗАҒА ЕСІм ҚОСУ">
+      ДОБАВИТЬ ИМЯ В БАЗУ
+    </button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="f-logo"><span>ЕРЛ</span>ЕР</div>
+  <p class="f-copy" data-ru="Открытая цифровая летопись героев Казахстана. Память — это то, что делает нас нацией." data-kz="Қазақстан батырларының ашық сандық жылнамасы. Жады — бізді ұлт ететін нәрсе.">Открытая цифровая летопись героев Казахстана. Память — это то, что делает нас нацией.</p>
+  <div class="f-since">1991</div>
+</footer>
+
+<!-- DETAIL MODAL -->
+<div class="overlay" id="overlay" onclick="closeOverlay(event)">
+  <div class="detail" id="detail-box">
+    <button class="detail-close" onclick="closeDetail()">✕</button>
+    <div id="detail-inner"></div>
+  </div>
+</div>
+
+<!-- FATIHAH MODAL -->
+<div class="fatiha-overlay" id="fatiha-overlay" onclick="closeFatihaOverlay(event)">
+  <div class="fatiha-box">
+    <button class="fatiha-close" onclick="closeFatiha()">✕</button>
+    <div style="font-size:13px;letter-spacing:.15em;text-transform:uppercase;color:rgba(82,183,136,.6);margin-bottom:6px" id="fatiha-for-label">Жадына · В память о</div>
+    <div class="fatiha-hero-name" id="fatiha-hero-name">—</div>
+    <div class="fatiha-arabic">
+      بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ<br>
+      الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ<br>
+      الرَّحْمَٰنِ الرَّحِيمِ<br>
+      مَالِكِ يَوْمِ الدِّينِ<br>
+      إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ<br>
+      اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ<br>
+      صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ
+    </div>
+    <div class="fatiha-translation" id="fatiha-trans">
+      Во имя Аллаха, Милостивого, Милосердного. Хвала Аллаху, Господу миров, Милостивому, Милосердному, Властелину Дня воздаяния. Тебе одному мы поклоняемся и у Тебя одного просим помощи. Наставь нас на прямой путь — путь тех, кого Ты облагодетельствовал.
+    </div>
+    <div class="fatiha-counter">
+      <span>🤲</span>
+      <span class="fatiha-count-num" id="fatiha-num">0</span>
+      <span id="fatiha-lbl">человек прочитали Фатиху</span>
+    </div>
+    <button class="btn-fatiha-read" id="btn-fatiha-read" onclick="readFatiha()">
+      🤲 Прочитал(а) Фатиху — Аминь
+    </button>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN MODAL -->
+<div class="admin-overlay" id="admin-overlay" onclick="closeAdminOverlay(event)">
+  <div class="admin-box">
+    <button class="admin-close" onclick="closeAdminLogin()">✕</button>
+    <h2>⚙ Вход для модераторов</h2>
+    <p>Введите пароль администратора для доступа к панели управления.</p>
+    <div class="fg">
+      <label class="flabel">Пароль</label>
+      <input class="fi" type="password" id="admin-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter') doAdminLogin()">
+      <div class="admin-error" id="admin-error">Неверный пароль</div>
+    </div>
+    <button class="btn-submit" style="margin-top:16px;width:100%;" onclick="doAdminLogin()">ВОЙТИ</button>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-panel" id="admin-panel">
+  <div class="admin-panel-head">
+    <h3>⚙ Панель модератора</h3>
+    <button class="logout-btn" onclick="adminLogout()">Выйти</button>
+  </div>
+  <div class="admin-panel-tabs">
+    <button class="apanel-tab active" onclick="switchAdminTab('pending',this)">
+      Заявки <span class="badge-count" id="pending-badge">0</span>
+    </button>
+    <button class="apanel-tab" onclick="switchAdminTab('heroes',this)">Записи</button>
+  </div>
+  <div class="admin-panel-body" id="admin-panel-body"></div>
+</div>
+
+<!-- SHARE CANVAS -->
+<canvas id="share-canvas" width="1080" height="1080"></canvas>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  DATABASE — localStorage (works standalone + Vercel)
+//  For production on Vercel: replace DB.* calls with
+//  fetch('/api/heroes?action=...') calls (see api/heroes.js)
+// ═══════════════════════════════════════════════════
+const DB = {
+  _key_heroes:  'erler_heroes_v1',
+  _key_pending: 'erler_pending_v1',
+
+  getHeroes(){
+    try{ return JSON.parse(localStorage.getItem(this._key_heroes)||'null') || DEFAULT_HEROES; }
+    catch(e){ return DEFAULT_HEROES; }
+  },
+  saveHeroes(list){
+    try{ localStorage.setItem(this._key_heroes, JSON.stringify(list)); } catch(e){}
+  },
+  getPending(){
+    try{ return JSON.parse(localStorage.getItem(this._key_pending)||'[]'); }
+    catch(e){ return []; }
+  },
+  savePending(list){
+    try{ localStorage.setItem(this._key_pending, JSON.stringify(list)); } catch(e){}
+  }
+};
+
+// ═══════════════════════════════════════════════════
+//  SEED DATA  (pre-approved heroes)
+// ═══════════════════════════════════════════════════
+const DEFAULT_HEROES = [
+  {
+    id:1, type:'fire', photo:null,
+    name_ru:'Серик Байжанов', name_kz:'Серік Байжанов',
+    death_date:'24.06.2022', years:'1979 – 2022',
+    city:'Алматы', city_ru:'Алматы', city_kz:'Алматы',
+    desc_ru:'Вошёл в охваченный огнём жилой дом и вынес на руках двух детей. Погиб при обрушении перекрытий. Последними его словами по рации были: «Дети в безопасности».',
+    desc_kz:'Өртке оранған тұрғын үйге кіріп, екі баланы алып шықты. Рациядағы соңғы сөздері: «Балалар қауіпсіз».',
+    award_ru:'Орден Айбын II степени (посмертно)', award_kz:'«Айбын» ордені II дәреже',
+    fatiha_count:128
+  },
+  {
+    id:2, type:'police', photo:null,
+    name_ru:'Дулат Ахметов', name_kz:'Дулат Ахметов',
+    death_date:'15.03.2021', years:'1990 – 2021',
+    city:'Астана', city_ru:'Астана', city_kz:'Астана',
+    desc_ru:'Во время задержания вооружённого преступника закрыл собой мирных граждан. Получил смертельное ранение.',
+    desc_kz:'Қарулы қылмыскерді ұстау кезінде бейбіт тұрғындарды денесімен жапты.',
+    award_ru:'Медаль «Ерлігі үшін»', award_kz:'«Ерлігі үшін» медалі',
+    fatiha_count:94
+  },
+  {
+    id:3, type:'rescue', photo:null,
+    name_ru:'Марат Сейткали', name_kz:'Марат Сейтқали',
+    death_date:'10.08.2023', years:'1985 – 2023',
+    city:'Шымкент', city_ru:'Шымкент', city_kz:'Шымкент',
+    desc_ru:'Погиб при поисково-спасательной операции в горах. Вытащил из лавины пятерых туристов — сам выбраться не успел.',
+    desc_kz:'Тауларда іздестіру-құтқару операциясында қаза тапты. Бес туристті алып шықты.',
+    award_ru:'—', award_kz:'—',
+    fatiha_count:67
+  }
+];
+
+// ═══════════════════════════════════════════════════
+//  SERVICE META
+// ═══════════════════════════════════════════════════
+const SVC = {
+  fire:      {cls:'s-fire',    ru:'МЧС / Пожарные',       kz:'МТЖ / Өртсөндіруші'},
+  police:    {cls:'s-police',  ru:'МВД / Полиция',        kz:'ІІМ / Полиция'},
+  military:  {cls:'s-military',ru:'Вооружённые силы',     kz:'Қарулы күштер'},
+  rescue:    {cls:'s-rescue',  ru:'Спасатели',            kz:'Құтқарушылар'},
+  nsc:       {cls:'s-nsc',     ru:'КНБ',                  kz:'ҰҚК'},
+  border:    {cls:'s-border',  ru:'Пограничная служба',   kz:'Шекара қызметі'},
+  guard:     {cls:'s-guard',   ru:'Национальная гвардия', kz:'Ұлттық гвардия'},
+  prison:    {cls:'s-prison',  ru:'КУИС',                 kz:'ҚУІҚК'},
+  emergency: {cls:'s-emergeny',ru:'Гражданская защита',   kz:'Азаматтық қорғаныс'}
+};
+
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+let HEROES       = DB.getHeroes();
+let lang         = 'ru';
+let activeFilter = 'all';
+let pendingPhoto = null;
+let currentDetailId = null;
+let fatihaHeroId = null;
+let isAdmin      = false;
+let adminTab     = 'pending';
+
+// Admin password — in production set via Vercel env var ADMIN_PASSWORD
+const ADMIN_PASSWORD = 'erler2024'; // change this!
+
+// ═══════════════════════════════════════════════════
+//  YEAR STRIP  1991 → 2030
+// ═══════════════════════════════════════════════════
+(function(){
+  const arr = [];
+  for(let y=1991; y<=2030; y++) arr.push(y);
+  const d = [...arr,...arr];
+  document.getElementById('yticker').innerHTML =
+    d.map(y=>`<span class="year-item${(y===1991||y===2030)?' gold':''}">${y}</span>`).join('');
+})();
+
+// ═══════════════════════════════════════════════════
+//  BURGER MENU
+// ═══════════════════════════════════════════════════
+function toggleMenu(){
+  const b=document.getElementById('burger');
+  const m=document.getElementById('mobile-menu');
+  b.classList.toggle('open');
+  m.classList.toggle('open');
+  document.body.style.overflow=m.classList.contains('open')?'hidden':'';
+}
+function closeMenu(){
+  document.getElementById('burger').classList.remove('open');
+  document.getElementById('mobile-menu').classList.remove('open');
+  document.body.style.overflow='';
+}
+window.addEventListener('scroll',()=>{
+  const secs=['heroes','submit','about'];
+  const bns=['bn-archive','bn-add','bn-about'];
+  let cur='bn-home';
+  secs.forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(el&&window.scrollY>=el.offsetTop-120) cur=bns[i];
+  });
+  document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
+  const a=document.getElementById(cur);
+  if(a) a.classList.add('active');
+});
+
+// ═══════════════════════════════════════════════════
+//  LANGUAGE
+// ═══════════════════════════════════════════════════
+function setLang(l){
+  lang = l;
+  document.getElementById('lru').classList.toggle('active', l==='ru');
+  document.getElementById('lkz').classList.toggle('active', l==='kz');
+  const mlru=document.getElementById('mlru');
+  const mlkz=document.getElementById('mlkz');
+  if(mlru) mlru.classList.toggle('active', l==='ru');
+  if(mlkz) mlkz.classList.toggle('active', l==='kz');
+  document.querySelectorAll('[data-ru]').forEach(el=>{
+    const t=el.getAttribute('data-'+l);
+    if(t) el.innerHTML=t;
+  });
+  const hnumLbl=document.getElementById('hnum-lbl');
+  if(hnumLbl) hnumLbl.textContent=l==='ru'?'записей':'жазба';
+  checkToday();
+  render();
+  updateFatihaModal();
+}
+
+// ═══════════════════════════════════════════════════
+//  FILTER
+// ═══════════════════════════════════════════════════
+function setFilter(f,btn){
+  activeFilter=f;
+  document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+// ═══════════════════════════════════════════════════
+//  TODAY IN HISTORY
+// ═══════════════════════════════════════════════════
+function getTodayDDMM(){
+  const now=new Date();
+  return `${String(now.getDate()).padStart(2,'0')}.${String(now.getMonth()+1).padStart(2,'0')}`;
+}
+function checkToday(){
+  const todayDDMM=getTodayDDMM();
+  const matches=HEROES.filter(h=>h.death_date&&h.death_date.startsWith(todayDDMM));
+  const lbl=document.getElementById('today-label');
+  const body=document.getElementById('today-body');
+  const tfBtn=document.getElementById('today-fatiha-btn');
+  lbl.textContent=lang==='ru'?'СЕГОДНЯ В ИСТОРИИ':'БҮГІН ТАРИХТА';
+  if(matches.length){
+    const h=matches[0];
+    const year=h.death_date.split('.')[2];
+    body.innerHTML=`
+      <div class="today-name">${h['name_'+lang]}</div>
+      <div class="today-sub">${SVC[h.type][lang]} · ${h['city_'+lang]} · ${year} ${lang==='ru'?'год':'жыл'}</div>`;
+    tfBtn.style.display='block';
+    tfBtn.textContent=lang==='ru'?'🤲 Прочитать Фатиху':'🤲 Фатиха оқу';
+    tfBtn.onclick=()=>openFatihaById(h.id);
+  } else {
+    body.innerHTML=`<div class="today-empty">${lang==='ru'?'В этот день нет совпадений в базе':'Бүгін базада сәйкестік жоқ'}</div>`;
+    tfBtn.style.display='none';
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════════
+function render(){
+  HEROES = DB.getHeroes();
+  const list=activeFilter==='all'?HEROES:HEROES.filter(h=>h.type===activeFilter);
+  document.getElementById('hnum').textContent=HEROES.length;
+  document.getElementById('hnum-lbl').textContent=lang==='ru'?'записей':'жазба';
+  const todayDDMM=getTodayDDMM();
+  const grid=document.getElementById('hero-grid');
+  if(!list.length){
+    grid.innerHTML=`<div class="empty"><div class="empty-icon" style="font-size:36px;color:rgba(200,151,60,.25);">✦</div>${lang==='ru'?'Записей не найдено':'Жазбалар табылмады'}</div>`;
+  } else {
+    grid.innerHTML=list.map(h=>cardHTML(h,todayDDMM)).join('');
+  }
+  // update search placeholder language
+  const searchEl=document.getElementById('archive-search');
+  if(searchEl) searchEl.placeholder=lang==='ru'?'Поиск по имени...':'Аты бойынша іздеу...';
+  renderArchive();
+}
+
+function cardHTML(h, todayDDMM){
+  const s=SVC[h.type];
+  const isToday=h.death_date&&h.death_date.startsWith(todayDDMM);
+  // clean silhouette SVG (no photo)
+  const noPhotoHTML=`<div class="hcard-photo"><div class="no-photo">
+    <svg width="52" height="68" viewBox="0 0 52 68" fill="none">
+      <ellipse cx="26" cy="16" rx="14" ry="14" fill="rgba(255,255,255,.1)"/>
+      <rect x="6" y="34" width="40" height="34" rx="5" fill="rgba(255,255,255,.07)"/>
+    </svg>
+    <span>${lang==='ru'?'Фото отсутствует':'Фото жоқ'}</span>
+  </div></div>`;
+  return `
+  <div class="hcard${isToday?' today-hero':''}" ${isToday?`data-today-label="${lang==='ru'?'Сегодня годовщина':'Бүгін жылы'}"`:''}
+    onclick="openDetail(${h.id})">
+    <div style="position:relative;overflow:hidden;">
+      ${h.photo?`<img src="${h.photo}" style="width:100%;height:260px;object-fit:cover;object-position:top center;display:block;">`:noPhotoHTML}
+      <span class="svc-badge ${s.cls}">${s[lang]}</span>
+      <span class="year-badge">${h.years}</span>
+    </div>
+    <div class="hcard-body">
+      <div class="hcard-name">${h['name_'+lang]}</div>
+      <div class="hcard-desc">${h['desc_'+lang]}</div>
+      <div class="hcard-foot">
+        <span class="hcard-city">📍 ${h['city_'+lang]||'—'}</span>
+        <div class="hcard-actions">
+          <button class="fatiha-btn" onclick="event.stopPropagation();openFatihaById(${h.id})">
+            🤲 <span class="fatiha-count">${h.fatiha_count||0}</span>
+          </button>
+          <span class="hcard-more">${lang==='ru'?'Подробнее':'Толығырақ'} →</span>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function archiveRow(h,i){
+  const s=SVC[h.type];
+  const thumb=h.photo
+    ?`<div class="arow-thumb"><img src="${h.photo}" alt=""></div>`
+    :`<div class="arow-thumb"><div class="no-img">👤</div></div>`;
+  return `<div class="arow" onclick="openDetail(${h.id})">
+    <div class="arow-num">${String(i+1).padStart(2,'0')}</div>
+    <div class="arow-info">
+      ${thumb}
+      <div class="arow-text">
+        <div class="arow-name">${h['name_'+lang]}</div>
+        <div class="arow-meta">
+          <span>${h.years}</span>
+          <span><span class="${s.cls} svc-badge" style="padding:1px 7px;font-size:9px">${s[lang]}</span></span>
+          <span>${h['city_'+lang]||''}</span>
+        </div>
+      </div>
+    </div>
+    <div>${h['award_'+lang]&&h['award_'+lang]!=='—'?`<span class="arow-award">★ ${h['award_'+lang]}</span>`:''}</div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+//  DETAIL MODAL
+// ═══════════════════════════════════════════════════
+function openDetail(id){
+  const h=HEROES.find(x=>x.id===id);
+  if(!h) return;
+  const s=SVC[h.type];
+  currentDetailId=id;
+  const deleteBtn=isAdmin?`<button class="detail-delete-btn" onclick="adminDeleteHero(${h.id})">🗑 Удалить запись</button>`:'';
+  document.getElementById('detail-inner').innerHTML=`
+    ${h.photo
+      ?`<img src="${h.photo}" class="detail-img" alt="${h['name_'+lang]}">`
+      :`<div class="detail-img-ph"><svg width="64" height="86" viewBox="0 0 64 86" fill="none"><ellipse cx="32" cy="20" rx="18" ry="18" fill="rgba(255,255,255,.1)"/><rect x="8" y="44" width="48" height="42" rx="6" fill="rgba(255,255,255,.07)"/></svg></div>`
+    }
+    <div class="detail-body">
+      <span class="svc-badge ${s.cls}" style="margin-bottom:12px;display:inline-block">${s[lang]}</span>
+      <div class="detail-name">${h['name_'+lang]}</div>
+      <div class="detail-sub">${h.years} · 📍 ${h['city_'+lang]||'—'}${h.death_date?` · ${h.death_date}`:''}</div>
+      <div class="detail-desc">${h['desc_'+lang]}</div>
+      ${h['award_'+lang]&&h['award_'+lang]!=='—'?`<div class="detail-award">★ ${h['award_'+lang]}</div>`:''}
+      <div class="detail-actions">
+        <button class="detail-fatiha-btn" onclick="openFatihaById(${h.id})">
+          🤲 ${lang==='ru'?'Прочитать Фатиху':'Фатиха оқу'} <span style="opacity:.6">(${h.fatiha_count||0})</span>
+        </button>
+        <button class="detail-share-btn" onclick="shareHero(${h.id})">
+          📤 ${lang==='ru'?'Поделиться':'Бөлісу'}
+        </button>
+        ${deleteBtn}
+      </div>
+    </div>`;
+  document.getElementById('overlay').classList.add('open');
+}
+function closeOverlay(e){ if(e.target===document.getElementById('overlay')) closeDetail(); }
+function closeDetail(){ document.getElementById('overlay').classList.remove('open'); }
+
+// ═══════════════════════════════════════════════════
+//  FATIHAH
+// ═══════════════════════════════════════════════════
+function openFatihaById(id){
+  fatihaHeroId=id;
+  const h=HEROES.find(x=>x.id===id);
+  if(!h) return;
+  updateFatihaModal();
+  document.getElementById('fatiha-overlay').classList.add('open');
+  const btn=document.getElementById('btn-fatiha-read');
+  btn.classList.remove('read');
+  btn.textContent=lang==='ru'?'🤲 Прочитал(а) Фатиху — Аминь':'🤲 Фатиха оқыдым — Әмин';
+  btn.disabled=false;
+}
+function updateFatihaModal(){
+  if(fatihaHeroId===null) return;
+  const h=HEROES.find(x=>x.id===fatihaHeroId);
+  if(!h) return;
+  document.getElementById('fatiha-hero-name').textContent=h['name_'+lang];
+  document.getElementById('fatiha-for-label').textContent=lang==='ru'?'Жадына · В память о':'Жадына · Естелігіне';
+  document.getElementById('fatiha-num').textContent=h.fatiha_count||0;
+  document.getElementById('fatiha-lbl').textContent=lang==='ru'?'человек прочитали Фатиху':'адам Фатиха оқыды';
+  document.getElementById('fatiha-trans').innerHTML=lang==='ru'
+    ?'Во имя Аллаха, Милостивого, Милосердного. Хвала Аллаху, Господу миров, Милостивому, Милосердному, Властелину Дня воздаяния. Тебе одному мы поклоняемся и у Тебя одного просим помощи. Наставь нас на прямой путь — путь тех, кого Ты облагодетельствовал, не тех, на кого пал гнев, и не заблудших. Амин.'
+    :'Аллаһтың атымен, Мейірімді, Рахымды. Мақтау Аллаһқа — ғаламдар Раббысына. Тек Саған ғана табынамыз. Тура жолға бастай гөр. Әмін.';
+}
+function readFatiha(){
+  if(fatihaHeroId===null) return;
+  const heroes=DB.getHeroes();
+  const h=heroes.find(x=>x.id===fatihaHeroId);
+  if(!h) return;
+  h.fatiha_count=(h.fatiha_count||0)+1;
+  DB.saveHeroes(heroes);
+  HEROES=heroes;
+  document.getElementById('fatiha-num').textContent=h.fatiha_count;
+  const btn=document.getElementById('btn-fatiha-read');
+  btn.textContent=lang==='ru'?'✅ Аллаһ рақымет етсін':'✅ Аллаһ рақымет етсін';
+  btn.classList.add('read');
+  btn.disabled=true;
+  render();
+}
+function closeFatihaOverlay(e){ if(e.target===document.getElementById('fatiha-overlay')) closeFatiha(); }
+function closeFatiha(){ document.getElementById('fatiha-overlay').classList.remove('open'); }
+
+// ═══════════════════════════════════════════════════
+//  PHOTO UPLOAD
+// ═══════════════════════════════════════════════════
+function handlePhoto(e){
+  const file=e.target.files[0];
+  if(!file) return;
+  if(file.size>5*1024*1024){ showToast(lang==='ru'?'⚠️ Файл слишком большой':'⚠️ Файл тым үлкен'); return; }
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    pendingPhoto=ev.target.result;
+    const prev=document.getElementById('upload-preview');
+    prev.src=pendingPhoto; prev.style.display='block';
+    document.getElementById('upload-ph').style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+
+// ═══════════════════════════════════════════════════
+//  SUBMIT — goes to PENDING (not live)
+// ═══════════════════════════════════════════════════
+function submitHero(){
+  const name=document.getElementById('fn').value.trim();
+  const desc=document.getElementById('fd').value.trim();
+  if(!name||!desc){ showToast(lang==='ru'?'⚠️ Заполните имя и описание':'⚠️ Атын және сипаттаманы толтырыңыз'); return; }
+  const cityVal=document.getElementById('fc').value.trim()||'—';
+  const pending=DB.getPending();
+  pending.push({
+    id: Date.now(),
+    type: document.getElementById('ft').value,
+    photo: pendingPhoto,
+    name_ru: name, name_kz: name,
+    death_date: document.getElementById('fy').value.trim()||'',
+    years: document.getElementById('fy').value.trim()||'—',
+    city: cityVal, city_ru: cityVal, city_kz: cityVal,
+    desc_ru: desc, desc_kz: desc,
+    award_ru: document.getElementById('fa').value.trim()||'—',
+    award_kz: document.getElementById('fa').value.trim()||'—',
+    source:   document.getElementById('fs').value.trim()||'',
+    fatiha_count: 0,
+    submitted_at: new Date().toISOString()
+  });
+  DB.savePending(pending);
+  ['fn','fy','fc','fd','fa','fs'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  pendingPhoto=null;
+  document.getElementById('upload-preview').style.display='none';
+  document.getElementById('upload-ph').style.display='';
+  document.getElementById('photo-input').value='';
+  showToast(lang==='ru'?'✅ Заявка отправлена на проверку модератору':'✅ Өтінім модераторға жіберілді');
+  // Update admin badge if logged in
+  if(isAdmin) renderAdminPanel();
+}
+
+// ═══════════════════════════════════════════════════
+//  ADMIN AUTH
+// ═══════════════════════════════════════════════════
+function openAdminLogin(){
+  if(isAdmin){ toggleAdminPanel(); return; }
+  document.getElementById('admin-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('admin-pass').focus(), 100);
+}
+function closeAdminLogin(){
+  document.getElementById('admin-overlay').classList.remove('open');
+  document.getElementById('admin-pass').value='';
+  document.getElementById('admin-error').style.display='none';
+}
+function closeAdminOverlay(e){ if(e.target===document.getElementById('admin-overlay')) closeAdminLogin(); }
+
+function doAdminLogin(){
+  const pass=document.getElementById('admin-pass').value;
+  if(pass===ADMIN_PASSWORD){
+    isAdmin=true;
+    closeAdminLogin();
+    const navBtn=document.getElementById('btn-admin-nav');
+    navBtn.classList.add('logged');
+    navBtn.textContent='⚙ Модератор';
+    document.getElementById('admin-panel').classList.add('open');
+    renderAdminPanel();
+    showToast('✅ Добро пожаловать, модератор');
+    render(); // re-render to show delete buttons
+  } else {
+    document.getElementById('admin-error').style.display='block';
+    document.getElementById('admin-pass').value='';
+    document.getElementById('admin-pass').focus();
+  }
+}
+
+function adminLogout(){
+  isAdmin=false;
+  document.getElementById('admin-panel').classList.remove('open');
+  const navBtn=document.getElementById('btn-admin-nav');
+  navBtn.classList.remove('logged');
+  navBtn.textContent='⚙ Admin';
+  render();
+}
+
+function toggleAdminPanel(){
+  const panel=document.getElementById('admin-panel');
+  if(panel.classList.contains('open')){
+    panel.classList.remove('open');
+  } else {
+    panel.classList.add('open');
+    renderAdminPanel();
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  ADMIN PANEL RENDER
+// ═══════════════════════════════════════════════════
+function switchAdminTab(tab, btn){
+  adminTab=tab;
+  document.querySelectorAll('.apanel-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAdminPanel();
+}
+
+function renderAdminPanel(){
+  const pending=DB.getPending();
+  const heroes=DB.getHeroes();
+  // update badge
+  document.getElementById('pending-badge').textContent=pending.length;
+  document.getElementById('pending-badge').style.display=pending.length?'inline-block':'none';
+
+  const body=document.getElementById('admin-panel-body');
+  if(adminTab==='pending'){
+    if(!pending.length){
+      body.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px;">Нет новых заявок</div>';
+      return;
+    }
+    body.innerHTML=pending.map(h=>`
+      <div class="pending-item" id="pitem-${h.id}">
+        <div class="pending-item-name">${h.name_ru}</div>
+        <div class="pending-item-meta">${SVC[h.type]?SVC[h.type].ru:'—'} · ${h.city_ru} · ${h.death_date||'дата не указана'}</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5;">${(h.desc_ru||'').slice(0,120)}${h.desc_ru&&h.desc_ru.length>120?'...':''}</div>
+        <div class="pending-item-actions">
+          <button class="btn-approve" onclick="approveHero(${h.id})">✓ Одобрить</button>
+          <button class="btn-reject" onclick="rejectHero(${h.id})">✕ Отклонить</button>
+        </div>
+      </div>`).join('');
+  } else {
+    if(!heroes.length){
+      body.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px;">Записей нет</div>';
+      return;
+    }
+    body.innerHTML=heroes.map(h=>`
+      <div class="admin-hero-item">
+        <div class="admin-hero-item-name">${h.name_ru}<br><span style="font-size:11px;color:var(--muted);font-weight:400;">${SVC[h.type]?SVC[h.type].ru:''} · ${h.city_ru||''}</span></div>
+        <button class="btn-delete-hero" onclick="adminDeleteHero(${h.id})">🗑 Удалить</button>
+      </div>`).join('');
+  }
+}
+
+function approveHero(id){
+  const pending=DB.getPending();
+  const heroes=DB.getHeroes();
+  const idx=pending.findIndex(h=>h.id===id);
+  if(idx===-1) return;
+  const [hero]=pending.splice(idx,1);
+  hero.status='approved';
+  heroes.push(hero);
+  DB.saveHeroes(heroes);
+  DB.savePending(pending);
+  HEROES=heroes;
+  renderAdminPanel();
+  render();
+  checkToday();
+  showToast('✅ Запись добавлена в базу');
+}
+
+function rejectHero(id){
+  const pending=DB.getPending();
+  const filtered=pending.filter(h=>h.id!==id);
+  DB.savePending(filtered);
+  renderAdminPanel();
+  showToast('🗑 Заявка отклонена');
+}
+
+function adminDeleteHero(id){
+  if(!confirm('Удалить эту запись из базы?')) return;
+  const heroes=DB.getHeroes().filter(h=>h.id!==id);
+  DB.saveHeroes(heroes);
+  HEROES=heroes;
+  closeDetail();
+  renderAdminPanel();
+  render();
+  checkToday();
+  showToast('🗑 Запись удалена');
+}
+
+// ═══════════════════════════════════════════════════
+//  SHARE CARD
+// ═══════════════════════════════════════════════════
+function shareHero(id){
+  const h=HEROES.find(x=>x.id===id);
+  if(!h) return;
+  const s=SVC[h.type];
+  const canvas=document.getElementById('share-canvas');
+  const ctx=canvas.getContext('2d');
+  const W=1080, H=1080;
+  ctx.fillStyle='#090D13';
+  ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='#C8973C'; ctx.lineWidth=8;
+  ctx.strokeRect(40,40,W-80,H-80);
+  ctx.lineWidth=2; ctx.strokeStyle='rgba(200,151,60,.3)';
+  ctx.strokeRect(60,60,W-120,H-120);
+  const drawCorner=(x,y,sx,sy)=>{
+    ctx.save(); ctx.translate(x,y); ctx.scale(sx,sy);
+    ctx.strokeStyle='rgba(200,151,60,.4)'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(0,60); ctx.lineTo(0,0); ctx.lineTo(60,0); ctx.stroke();
+    ctx.restore();
+  };
+  drawCorner(40,40,1,1); drawCorner(W-40,40,-1,1);
+  drawCorner(40,H-40,1,-1); drawCorner(W-40,H-40,-1,-1);
+
+  const drawText=()=>{
+    ctx.fillStyle='rgba(200,151,60,.15)';
+    const badgeW=280,badgeH=36,badgeX=(W-badgeW)/2;
+    ctx.fillRect(badgeX,540,badgeW,badgeH);
+    ctx.strokeStyle='rgba(200,151,60,.4)'; ctx.lineWidth=1;
+    ctx.strokeRect(badgeX,540,badgeW,badgeH);
+    ctx.fillStyle='#C8973C'; ctx.font='bold 14px Inter,sans-serif';
+    ctx.textAlign='center'; ctx.fillText(s[lang].toUpperCase(),W/2,563);
+    ctx.fillStyle='#EDE9E0'; ctx.font='bold 52px Georgia,serif';
+    ctx.fillText(h['name_'+lang],W/2,640);
+    ctx.fillStyle='rgba(107,119,140,.8)'; ctx.font='28px Inter,sans-serif';
+    ctx.fillText(h.years,W/2,690);
+    ctx.fillStyle='rgba(107,119,140,.6)'; ctx.font='22px Inter,sans-serif';
+    ctx.fillText('📍 '+h['city_'+lang],W/2,730);
+    ctx.fillStyle='rgba(82,183,136,.7)'; ctx.font='18px Inter,sans-serif';
+    ctx.fillText(`🤲 ${h.fatiha_count||0} ${lang==='ru'?'человек прочитали Фатиху':'адам Фатиха оқыды'}`,W/2,790);
+    ctx.fillStyle='rgba(200,151,60,.6)'; ctx.font='bold 28px Georgia,serif';
+    ctx.fillText('ЕРЛЕР',W/2,H-90);
+    ctx.fillStyle='rgba(107,119,140,.5)'; ctx.font='14px Inter,sans-serif';
+    ctx.fillText(lang==='ru'?'Цифровой мемориал героев Казахстана':'Қазақстан батырларының сандық мемориалы',W/2,H-60);
+    const link=document.createElement('a');
+    link.download=`erler-${h.id}.png`;
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    showToast(lang==='ru'?'📥 Карточка сохранена':'📥 Карточка сақталды');
+  };
+
+  if(h.photo){
+    const img=new Image();
+    img.onload=()=>{
+      const imgSize=380;
+      ctx.save(); ctx.beginPath(); ctx.arc(W/2,320,imgSize/2,0,Math.PI*2); ctx.clip();
+      ctx.drawImage(img,W/2-imgSize/2,130,imgSize,imgSize); ctx.restore();
+      ctx.strokeStyle='#C8973C'; ctx.lineWidth=4;
+      ctx.beginPath(); ctx.arc(W/2,320,imgSize/2+6,0,Math.PI*2); ctx.stroke();
+      drawText();
+    };
+    img.src=h.photo;
+  } else {
+    ctx.fillStyle='rgba(25,35,51,.8)';
+    ctx.beginPath(); ctx.arc(W/2,300,180,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='rgba(200,151,60,.3)'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(W/2,300,180,0,Math.PI*2); ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.08)';
+    ctx.beginPath(); ctx.arc(W/2,268,68,0,Math.PI*2); ctx.fill();
+    ctx.fillRect(W/2-78,340,156,120);
+    drawText();
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  ARCHIVE SEARCH
+// ═══════════════════════════════════════════════════
+let archiveQuery = '';
+
+function onArchiveSearch(val){
+  archiveQuery = val.trim().toLowerCase();
+  const clearBtn = document.getElementById('archive-search-clear');
+  const icon     = document.getElementById('archive-search-icon');
+  if(archiveQuery){
+    clearBtn.style.display = 'block';
+    icon.style.display     = 'none';
+  } else {
+    clearBtn.style.display = 'none';
+    icon.style.display     = 'block';
+  }
+  renderArchive();
+}
+
+function clearArchiveSearch(){
+  archiveQuery = '';
+  document.getElementById('archive-search').value = '';
+  document.getElementById('archive-search-clear').style.display = 'none';
+  document.getElementById('archive-search-icon').style.display  = 'block';
+  renderArchive();
+}
+
+function renderArchive(){
+  const list = archiveQuery
+    ? HEROES.filter(h =>
+        (h.name_ru||'').toLowerCase().includes(archiveQuery) ||
+        (h.name_kz||'').toLowerCase().includes(archiveQuery) ||
+        (h.city_ru||'').toLowerCase().includes(archiveQuery)
+      )
+    : HEROES;
+
+  const container = document.getElementById('archive-list');
+  if(!list.length){
+    container.innerHTML = `<div class="archive-empty">${
+      archiveQuery
+        ? (lang==='ru' ? `По запросу «${archiveQuery}» ничего не найдено` : `«${archiveQuery}» бойынша ештеңе табылмады`)
+        : (lang==='ru' ? 'Записей пока нет' : 'Жазбалар жоқ')
+    }</div>`;
+  } else {
+    container.innerHTML = list.map((h,i) => archiveRow(h,i)).join('');
+  }
+}
+
+// Update setLang to also re-run renderArchive
+const _origSetLang = setLang;
+
+// ═══════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════
+function gotoSection(id){ document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+render();
+checkToday();
+let c=0, tgt=HEROES.length;
+const tk=setInterval(()=>{ document.getElementById('hnum').textContent=++c; if(c>=tgt) clearInterval(tk); },200);
+</script>
+</body>
+</html>
