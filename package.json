@@ -1,0 +1,11 @@
+{
+  "name": "erler-memorial",
+  "version": "1.0.0",
+  "description": "ЕРЛЕР — Цифровой мемориал героев Казахстана",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

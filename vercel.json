@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/heroes.js" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}
